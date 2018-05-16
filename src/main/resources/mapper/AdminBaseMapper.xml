@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.mpdatabs.dao.IAdminBaseDao">
+
+    <resultMap id="Issues" type="com.example.mpdatabs.entity.IssueDO">
+        <id property="issueId" column="issueId"/>
+        <result property="issue" column="issue"/>
+        <result property="status" column="status"/>
+        <result property="issueSource" column="issueSource"/>
+        <result property="userMsg.phone" column="phone"/>
+        <result property="userMsg.userName" column="userName"/>
+        <collection property="tagIdList" ofType="com.example.mpdatabs.entity.TagMsgDO" column="tagId">
+            <result property="tagId" column="tagId"/>
+            <result property="tag" column="tag"/>
+        </collection>
+    </resultMap>
+    
+    <select id="login" resultType="com.example.mpdatabs.entity.AdminMsgDO">
+        SELECT adminName,password,adminId FROM admin_msg WHERE adminName = #{adminMsg.adminName}
+    </select>
+
+    <select id="listAdmin" resultType="com.example.mpdatabs.entity.AdminMsgDO">
+        SELECT adminId FROM admin_msg WHERE adminId = #{adminId}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE admin_msg SET password = #{adminMsg.password} WHERE adminName = #{adminMsg.adminName}
+    </update>
+
+    <select id="listIssues" resultMap="Issues">
+        SELECT i.issueId,i.issue,i.issueSource,i.status,u.phone,u.userName,it.tagId,t.tag
+        FROM user_issue i
+        LEFT JOIN user_msg u ON i.phone = u.phone
+        LEFT JOIN issue_tag it ON i.issueId = it.issueId
+        LEFT JOIN tag t ON it.tagId = t.tagId
+        <where>
+            <if test="issueSource!=null">
+                AND i.issueSource = #{issueSource}
+            </if>
+        </where>
+        ORDER BY i.issueId,it.tagId
+    </select>
+
+    <delete id="deleteIssue">
+        DELETE FROM user_issue WHERE issueId = #{issueId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.mpdatabs.dao.IIssueTagBaseDao">
+
+    <select id="listTag" resultType="com.example.mpdatabs.entity.TagMsgDO">
+        SELECT tagId,tag,status,tagSource,color FROM tag
+        WHERE 1 = 1
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY tagId
+    </select>
+
+    <select id="selectTag" resultType="com.example.mpdatabs.entity.TagMsgDO">
+        SELECT tagId,tag,status,color FROM tag WHERE tag = #{tag}
+    </select>
+
+    <insert id="insertTag">
+        INSERT INTO tag (tag,status,tagSource,color) VALUES (#{tagMsg.tag},#{tagMsg.status},#{tagMsg.tagSource},#{tagMsg.color})
+    </insert>
+
+    <update id="updateTagstatus">
+        UPDATE tag SET status = #{tagMsg.status} WHERE tagId = #{tagMsg.tagId}
+    </update>
+
+    <insert id="saveIssueTags">
+        INSERT INTO issue_tag (issueId, tagId)
+        VALUES
+        <foreach collection="tagIdList" item="tagId" separator=",">
+            (#{issueId},#{tagId})
+        </foreach>
+
+    </insert>
+
+    <delete id="deleteIssueTags">
+        DELETE FROM issue_tag WHERE issueId = #{issueId}
+    </delete>
+
+    <update id="updateIssueStatus">
+        UPDATE user_issue SET status = #{status} WHERE issueId = #{issueId}
+    </update>
+
+
+</mapper>

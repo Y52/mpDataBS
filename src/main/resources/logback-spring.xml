@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">   <!--debug=true，则会打印logback自身的日志信息-->
+    <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
+    <property name="LOG_HOME" value="/Users/guiwukeji/Documents/log" />  <!--变量定义--><!--win下：E:\\test\\log,linux下，/test/log-->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%date{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) -- %boldYellow(%thread) -- %boldMagenta(%logger) : %cyan(%msg%n)"/>
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">    <!--appender设置日志输出位置，控制台或文件。ConsoleAppender是控制台输出-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">   <!--encoder表示对日志进行编码-->
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <!--pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern-->
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!-- 按照每天生成日志文件 -->
+    <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">     <!--日志输出到文件-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  <!--定义日志如何切分-->
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/TestWeb.log.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>20MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!--每一个logger标签，都用来设置一个具体的包或者类的日志打印级别,若未设置level，则默认继承root的-->
+
+    <!-->多环境配置，prod生产环境，test测试环境，dev开发环境。最后部署启动服务的时候，直接java -jar xxx.jar -(两个)spring.profiles.active=prod就表示部署为生产环境。
+    <springProfile name="test,dev">
+        <logger name="com.thingcom.demo.domain.PlcRegisterAddress" level="info"/>
+    </springProfile>
+    <-->
+    <!--本地类日志配置-->
+    <logger name="com.thingcom.common" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="com.example.mpdatabs" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+
+    <!--myibatis log configure-->
+    <logger name="com.apache.ibatis" level="TRACE"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
+
+
+    <logger name="com.example.mpdatabs.dao" level="TRACE" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.example.mpdatabs.test.dao" level="TRACE" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!--logger标签和root标签功能一样。此外，如果additivity属性为true，则会将该日志信息上传root-->
+    <!--additivity标签默认为true-->
+    <!--root或者logger，只要带有appender-ref标签，就会在该层打印到appender中-->
+
+    <!-- 日志输出级别 -->
+    <!--日志传递过程：首先从logger到root再到appender-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />   <!--root添加了appender,才会将日志输出到appender,logger也一样-->
+        <appender-ref ref="FILE" />
+    </root>
+
+    <!--日志异步到数据库 -->
+    <!--<appender name="DB" class="ch.qos.logback.classic.db.DBAppender">-->
+    <!--&lt;!&ndash;日志异步到数据库 &ndash;&gt;-->
+    <!--<connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">-->
+    <!--&lt;!&ndash;连接池 &ndash;&gt;-->
+    <!--<dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource">-->
+    <!--<driverClass>com.mysql.jdbc.Driver</driverClass>-->
+    <!--<url>jdbc:mysql://127.0.0.1:3306/databaseName</url>-->
+    <!--<user>root</user>-->
+    <!--<password>root</password>-->
+    <!--</dataSource>-->
+    <!--</connectionSource>-->
+    <!--</appender>-->
+</configuration>
